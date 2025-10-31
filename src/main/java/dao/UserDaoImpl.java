@@ -1,6 +1,6 @@
 package dao;
 
-import models.User;
+import entity.User;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.slf4j.Logger;
@@ -8,6 +8,12 @@ import org.slf4j.LoggerFactory;
 import utils.HibernateUtil;
 import java.util.List;
 
+/**
+ * Реализация интерфейса {@link UserDao} с использованием ORM-фреймворка Hibernate.
+ * Для каждой операции используется новая сессия Hibernate,
+ * а при изменении данных -- транзакция.
+ * Все операции логируются через {@link org.slf4j.Logger}.
+ */
 public class UserDaoImpl implements UserDao {
 
     private static final Logger logger = LoggerFactory.getLogger(UserDaoImpl.class);
@@ -37,9 +43,11 @@ public class UserDaoImpl implements UserDao {
             } else {
                 logger.warn("Пользователь с ID {} не найден", id);
             }
+
             return user;
         } catch (Exception e) {
             logger.error("Ошибка при поиске по ID {}", id, e);
+
             return null;
         }
     }
@@ -49,9 +57,11 @@ public class UserDaoImpl implements UserDao {
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
             List<User> users = session.createQuery("from User", User.class).list();
             logger.info("Получено {} пользователей", users.size());
+
             return users;
         } catch (Exception e) {
             logger.error("Ошибка при получении пользователей", e);
+
             return List.of();
         }
     }

@@ -2,7 +2,7 @@ package services;
 
 import dao.UserDao;
 import dao.UserDaoImpl;
-import models.User;
+import entity.User;
 import java.util.List;
 import java.util.Scanner;
 

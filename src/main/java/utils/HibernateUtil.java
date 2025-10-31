@@ -1,6 +1,6 @@
 package utils;
 
-import models.User;
+import entity.User;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
 
