@@ -3,7 +3,10 @@ package dao;
 import entity.UserEntity;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
@@ -12,7 +15,11 @@ import utils.HibernateUtil;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Интеграционные тесты для {@link UserDaoImpl} с использованием Testcontainers и PostgreSQL.
@@ -73,11 +80,12 @@ class UserDaoImplTest {
     @Test
     void create_shouldPersistUserInDatabase() {
         UserEntity user = createTestUser();
-
         userDao.create(user);
 
         assertNotNull(user.getId(), "ID должен быть присвоен после сохранения");
+
         UserEntity found = userDao.getById(user.getId());
+
         assertNotNull(found, "Пользователь должен быть найден");
         assertEquals(user.getEmail(), found.getEmail());
     }
@@ -102,8 +110,7 @@ class UserDaoImplTest {
      */
     @Test
     void getById_nonExistingId_shouldReturnNull() {
-        UserEntity result = userDao.getById(999);
-        assertNull(result);
+        assertNull(userDao.getById(999));
     }
 
     /**

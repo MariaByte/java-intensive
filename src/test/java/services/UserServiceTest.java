@@ -6,14 +6,18 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
  * Unit-тесты для {@link UserService} выполнены с использованием Mockito.
@@ -34,7 +38,7 @@ public class UserServiceTest {
     @Test
     public void createUserShouldSucceedWhenDataIsValid() {
         userService.createUser("Маша", "masha@mail.ru", 25);
-        Mockito.verify(userDao).create(Mockito.any(UserEntity.class));
+        verify(userDao).create(any(UserEntity.class));
     }
 
     /**
@@ -76,12 +80,12 @@ public class UserServiceTest {
     @Test
     void getUserByIdShouldReturnUserWhenExists() {
         UserEntity user = new UserEntity("Коля", "kolya@mail.ru", 30);
-        Mockito.when(userDao.getById(1)).thenReturn(user);
+        when(userDao.getById(1)).thenReturn(user);
 
         UserEntity result = userService.getUserById(1);
         assertEquals("Коля", result.getName());
         assertEquals("kolya@mail.ru", result.getEmail());
-        Mockito.verify(userDao).getById(1);
+        verify(userDao).getById(1);
     }
 
     /**
@@ -93,11 +97,11 @@ public class UserServiceTest {
         UserEntity user2 = new UserEntity("Вова", "vova@mail.ru", 28);
         List<UserEntity> users = Arrays.asList(user1, user2);
 
-        Mockito.when(userDao.getAll()).thenReturn(users);
+        when(userDao.getAll()).thenReturn(users);
 
         List<UserEntity> result = userService.getAllUsers();
         assertEquals(2, result.size());
-        Mockito.verify(userDao).getAll();
+        verify(userDao).getAll();
     }
 
     /**
@@ -106,10 +110,10 @@ public class UserServiceTest {
      */
     @Test
     void getAllUsersShouldReturnEmptyListWhenNoUsersExist() {
-        Mockito.when(userDao.getAll()).thenReturn(Collections.emptyList());
+        when(userDao.getAll()).thenReturn(Collections.emptyList());
         List<UserEntity> result = userService.getAllUsers();
         assertTrue(result.isEmpty());
-        Mockito.verify(userDao).getAll();
+        verify(userDao).getAll();
     }
 
     /**
@@ -118,14 +122,14 @@ public class UserServiceTest {
     @Test
     void updateUserShouldSucceedWhenUserExistsAndDataIsValid() {
         UserEntity existingUser = new UserEntity("Алиса", "alice@mail.ru", 25);
-        Mockito.when(userDao.getById(1)).thenReturn(existingUser);
+        when(userDao.getById(1)).thenReturn(existingUser);
 
         userService.updateUser(1, "Алиса Обновлённая", "alice.updated@mail.ru", 26);
 
         assertEquals("Алиса Обновлённая", existingUser.getName());
         assertEquals("alice.updated@mail.ru", existingUser.getEmail());
         assertEquals(26, existingUser.getAge());
-        Mockito.verify(userDao).update(existingUser);
+        verify(userDao).update(existingUser);
     }
 
     /**
@@ -134,7 +138,7 @@ public class UserServiceTest {
      */
     @Test
     void updateUserShouldThrowExceptionWhenUserDoesNotExist() {
-        Mockito.when(userDao.getById(1)).thenReturn(null);
+        when(userDao.getById(1)).thenReturn(null);
 
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () ->
                 userService.updateUser(1, "Алиса", "alice@mail.ru", 25)
@@ -148,6 +152,6 @@ public class UserServiceTest {
     @Test
     void deleteUserShouldCallDaoDelete() {
         userService.deleteUser(1);
-        Mockito.verify(userDao).delete(1);
+        verify(userDao).delete(1);
     }
 }
