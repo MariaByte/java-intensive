@@ -2,22 +2,21 @@ package services;
 
 import dao.UserDao;
 import dao.UserDaoImpl;
-import entity.User;
+import entity.UserEntity;
+
 import java.util.List;
 import java.util.Scanner;
 
 public class UserConsoleService {
 
-    private final UserDao userDao = new UserDaoImpl();
+    private final UserService userService = new UserService();
     private final Scanner scanner = new Scanner(System.in);
 
     public void start() {
         boolean running = true;
         while (running) {
             printMenu();
-
             System.out.print("Пункт: ");
-
             String input = scanner.nextLine().trim();
             if (input.isEmpty()) continue;
 
@@ -52,18 +51,28 @@ public class UserConsoleService {
 
     private void createUser() {
         System.out.println("\n=== Создание пользователя ===");
-        String name = readNonEmptyString("Имя: ");
-        String email = readNonEmptyString("Email: ");
+
+        System.out.print("Имя: ");
+        String name = scanner.nextLine().trim();
+
+        System.out.print("Email: ");
+        String email = scanner.nextLine().trim();
+
         int age = readInt("Возраст: ");
 
-        userDao.create(new User(name, email, age));
-        System.out.println("Пользователь создан!");
+        try {
+            userService.createUser(name, email, age);
+            System.out.println("Пользователь создан!");
+        } catch (IllegalArgumentException e) {
+            System.out.println(e.getMessage());
+        }
     }
 
     private void listUsers() {
-        List<User> users = userDao.getAll();
+        List<UserEntity> users = userService.getAllUsers();
         if (users.isEmpty()) {
             System.out.println("Нет пользователей.");
+
             return;
         }
 
@@ -72,7 +81,7 @@ public class UserConsoleService {
                 "ID", "Имя", "Email", "Возраст", "Дата создания");
         System.out.println("---------------------------------------------------------------");
 
-        for (User user : users) {
+        for (UserEntity user : users) {
             System.out.printf("%-5d | %-20s | %-25s | %-6d | %-20s%n",
                     user.getId(),
                     user.getName(),
@@ -85,9 +94,9 @@ public class UserConsoleService {
 
     private void getUserById() {
         int id = readInt("Введите ID: ");
-        User user = userDao.getById(id);
+        UserEntity user = userService.getUserById(id);
         if (user != null) {
-            System.out.println("\n🔎 Найден пользователь:");
+            System.out.println("\n Найден пользователь:");
             System.out.println(user);
         } else {
             System.out.println("Пользователь не найден.");
@@ -96,7 +105,7 @@ public class UserConsoleService {
 
     private void updateUser() {
         int id = readInt("Введите ID: ");
-        User user = userDao.getById(id);
+        UserEntity user = userService.getUserById(id);
         if (user == null) {
             System.out.println("Пользователь не найден.");
             return;
@@ -105,31 +114,41 @@ public class UserConsoleService {
         System.out.println("Введите новые данные (оставьте пустым, если не надо менять):");
 
         System.out.print("Имя (" + user.getName() + "): ");
-        String newName = scanner.nextLine();
-        if (!newName.isBlank()) user.setName(newName);
+        String newName = scanner.nextLine().trim();
+        if (newName.isEmpty()) {
+            newName = user.getName();
+        }
 
         System.out.print("Email (" + user.getEmail() + "): ");
-        String newEmail = scanner.nextLine();
-        if (!newEmail.isBlank()) user.setEmail(newEmail);
+        String newEmail = scanner.nextLine().trim();
+        if (newEmail.isEmpty()) {
+            newEmail = user.getEmail();
+        }
 
         System.out.print("Возраст (" + user.getAge() + "): ");
-        String newAgeStr = scanner.nextLine();
-        if (!newAgeStr.isBlank()) {
+        String newAgeStr = scanner.nextLine().trim();
+        int newAge = user.getAge();
+        if (!newAgeStr.isEmpty()) {
             try {
-                user.setAge(Integer.parseInt(newAgeStr));
+                newAge = Integer.parseInt(newAgeStr);
             } catch (NumberFormatException e) {
-                System.out.println("Возраст должен быть числом.");
+                System.out.println("Некорректный возраст. Изменение отменено.");
+                return;
             }
         }
 
-        userDao.update(user);
-        System.out.println("Пользователь обновлён!");
+        try {
+            userService.updateUser(id, newName, newEmail, newAge);
+            System.out.println("Пользователь обновлён!");
+        } catch (IllegalArgumentException e) {
+            System.out.println(e.getMessage());
+        }
     }
 
     private void deleteUser() {
         int id = readInt("Введите ID пользователя: ");
-        userDao.delete(id);
-        System.out.println("🗑️  Пользователь удалён.");
+        userService.deleteUser(id);
+        System.out.println("Пользователь удалён.");
     }
 
     private int readInt(String prompt) {
@@ -141,17 +160,6 @@ public class UserConsoleService {
             } catch (NumberFormatException e) {
                 System.out.println("Введите корректное число.");
             }
-        }
-    }
-
-    private String readNonEmptyString(String prompt) {
-        while (true) {
-            System.out.print(prompt);
-            String input = scanner.nextLine().trim();
-            if (!input.isEmpty()) {
-                return input;
-            }
-            System.out.println("Поле не может быть пустой строкой. Попробуйте снова.");
         }
     }
 }

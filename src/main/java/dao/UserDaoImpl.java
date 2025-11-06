@@ -1,11 +1,12 @@
 package dao;
 
-import entity.User;
+import entity.UserEntity;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import utils.HibernateUtil;
+
 import java.util.List;
 
 /**
@@ -19,32 +20,36 @@ public class UserDaoImpl implements UserDao {
     private static final Logger logger = LoggerFactory.getLogger(UserDaoImpl.class);
 
     @Override
-    public void create(User user) {
+    public void create(UserEntity userEntity) {
         Transaction tx = null;
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
             tx = session.beginTransaction();
-            session.persist(user);
+            session.persist(userEntity);
             tx.commit();
-            logger.info("Пользователь успешно создан: {}", user);
+            logger.info("Пользователь успешно создан: {}", userEntity);
         } catch (Exception e) {
-            if (tx != null) {
-                tx.rollback();
+            if (tx != null && tx.getStatus().canRollback()) {
+                try {
+                    tx.rollback();
+                } catch (Exception ex) {
+                    logger.warn("Не удалось выполнить rollback транзакции", ex);
+                }
             }
-            logger.error("Ошибка при создании пользователя: {}", user, e);
+            logger.error("Ошибка при создании пользователя: {}", userEntity, e);
         }
     }
 
     @Override
-    public User getById(int id) {
+    public UserEntity getById(int id) {
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
-            User user = session.get(User.class, id);
-            if (user != null) {
-                logger.info("Пользователь найден по ID {}: {}", id, user);
+            UserEntity userEntity = session.get(UserEntity.class, id);
+            if (userEntity != null) {
+                logger.info("Пользователь найден по ID {}: {}", id, userEntity);
             } else {
                 logger.warn("Пользователь с ID {} не найден", id);
             }
 
-            return user;
+            return userEntity;
         } catch (Exception e) {
             logger.error("Ошибка при поиске по ID {}", id, e);
 
@@ -53,12 +58,12 @@ public class UserDaoImpl implements UserDao {
     }
 
     @Override
-    public List<User> getAll() {
+    public List<UserEntity> getAll() {
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
-            List<User> users = session.createQuery("from User", User.class).list();
-            logger.info("Получено {} пользователей", users.size());
+            List<UserEntity> userEntities = session.createQuery("from UserEntity", UserEntity.class).list();
+            logger.info("Получено {} пользователей", userEntities.size());
 
-            return users;
+            return userEntities;
         } catch (Exception e) {
             logger.error("Ошибка при получении пользователей", e);
 
@@ -67,16 +72,16 @@ public class UserDaoImpl implements UserDao {
     }
 
     @Override
-    public void update(User user) {
+    public void update(UserEntity userEntity) {
         Transaction tx = null;
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
             tx = session.beginTransaction();
-            session.merge(user);
+            session.merge(userEntity);
             tx.commit();
-            logger.info("Пользователь обновлён: {}", user);
+            logger.info("Пользователь обновлён: {}", userEntity);
         } catch (Exception e) {
             if (tx != null) tx.rollback();
-            logger.error("Ошибка при обновлении: {}", user, e);
+            logger.error("Ошибка при обновлении: {}", userEntity, e);
         }
     }
 
@@ -85,10 +90,10 @@ public class UserDaoImpl implements UserDao {
         Transaction tx = null;
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
             tx = session.beginTransaction();
-            User user = session.get(User.class, id);
-            if (user != null) {
-                session.remove(user);
-                logger.info("Пользователь удалён: {}", user);
+            UserEntity userEntity = session.get(UserEntity.class, id);
+            if (userEntity != null) {
+                session.remove(userEntity);
+                logger.info("Пользователь удалён: {}", userEntity);
             } else {
                 logger.warn("Попытка удалить несуществующего пользователя с ID {}", id);
             }

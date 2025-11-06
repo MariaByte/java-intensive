@@ -1,6 +1,7 @@
 package dao;
 
-import entity.User;
+import entity.UserEntity;
+
 import java.util.List;
 
 /**
@@ -12,32 +13,32 @@ public interface UserDao {
     /**
      * Создаёт нового пользователя в базе данных.
      *
-     * @param user объект пользователя, который необходимо сохранить
+     * @param userEntity объект пользователя, который необходимо сохранить
      */
-    void create(User user);
+    void create(UserEntity userEntity);
 
     /**
      * Находит пользователя по идентификатору.
      *
      * @param id уникальный идентификатор.
-     * @return объект {@link User}, если найден, иначе null
+     * @return объект {@link UserEntity}, если найден, иначе null
      */
-    User getById(int id);
+    UserEntity getById(int id);
 
     /**
      * Возвращает список пользователей.
      *
-     * @return список объектов {@link User}.
+     * @return список объектов {@link UserEntity}.
      * Если в базе данных нет пользователей, возвращается пустой список.
      */
-    List<User> getAll();
+    List<UserEntity> getAll();
 
     /**
      * Обновляет данные существуующего пользователя.
      *
-     * @param user объект {@link User} с обновлёнными данными, не должен быть null
+     * @param userEntity объект {@link UserEntity} с обновлёнными данными, не должен быть null
      */
-    void update(User user);
+    void update(UserEntity userEntity);
 
     /**
      * Удаляет пользователя из базы данных по идентификатору.
