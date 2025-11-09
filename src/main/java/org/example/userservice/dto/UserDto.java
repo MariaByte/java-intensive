@@ -1,6 +1,5 @@
 package org.example.userservice.dto;
 
-import org.example.userservice.entity.UserEntity;
 import java.time.LocalDateTime;
 
 /**
