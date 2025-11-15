@@ -15,14 +15,15 @@ import java.util.stream.Collectors;
  * Выполняет валидацию данных и преобразует данные между {@link UserEntity} и {@link UserDto}.
  */
 @Service
-public class UserService {
+public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
 
-    public UserService(UserRepository userRepository) {
+    public UserServiceImpl(UserRepository userRepository) {
         this.userRepository = userRepository;
     }
 
+    @Override
     public UserDto createUser(UserDto userDto) {
         validateUserData(userDto);
 
@@ -37,6 +38,7 @@ public class UserService {
         return toDto(savedUserEntity);
     }
 
+    @Override
     public UserDto getUserById(int id) {
         UserEntity userEntity = userRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Пользователь с ID " + id + " не найден"));
@@ -44,6 +46,7 @@ public class UserService {
         return toDto(userEntity);
     }
 
+    @Override
     public List<UserDto> getAllUsers() {
         return userRepository.findAll()
                 .stream()
@@ -51,6 +54,7 @@ public class UserService {
                 .collect(Collectors.toList());
     }
 
+    @Override
     public UserDto updateUser(int id, UserDto userDto) {
         UserEntity existingUser = userRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Пользователь с ID " + id + " не найден"));
@@ -66,6 +70,7 @@ public class UserService {
        return toDto(updatedUserEntity);
     }
 
+    @Override
     public void deleteUser(int id) {
         userRepository.deleteById(id);
     }
