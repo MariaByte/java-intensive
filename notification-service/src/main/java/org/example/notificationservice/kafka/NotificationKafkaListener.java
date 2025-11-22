@@ -15,10 +15,12 @@ import org.springframework.stereotype.Service;
 public class NotificationKafkaListener {
 
     private final NotificationProcessorService processorService;
-    private final ObjectMapper mapper = new ObjectMapper();
+    private final ObjectMapper mapper;
 
-    public NotificationKafkaListener(NotificationProcessorService processorService) {
+    public NotificationKafkaListener(NotificationProcessorService processorService,
+                                     ObjectMapper mapper) {
         this.processorService = processorService;
+        this.mapper = mapper;
     }
 
     /**
