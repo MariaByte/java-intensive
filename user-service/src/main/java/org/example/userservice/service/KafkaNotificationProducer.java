@@ -14,15 +14,17 @@ import org.springframework.stereotype.Service;
 public class KafkaNotificationProducer implements NotificationProducer {
 
     private KafkaTemplate<String, String> kafkaTemplate;
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    private final ObjectMapper mapper;
 
     /**
      * Создаёт KafkaNotificationProducer с указанным KafkaTemplate.
      *
      * @param kafkaTemplate шаблон для отправки сообщений в Kafka
      */
-    public KafkaNotificationProducer(KafkaTemplate<String, String> kafkaTemplate) {
+    public KafkaNotificationProducer(KafkaTemplate<String, String> kafkaTemplate,
+                                     ObjectMapper mapper) {
         this.kafkaTemplate = kafkaTemplate;
+        this.mapper = mapper;
     }
 
     /**
@@ -55,7 +57,7 @@ public class KafkaNotificationProducer implements NotificationProducer {
     private void sendNotification(String email, String type) {
         try {
             UserNotificationDto dto = new UserNotificationDto(email, type);
-            String json = objectMapper.writeValueAsString(dto);
+            String json = mapper.writeValueAsString(dto);
             kafkaTemplate.send("user-notifications", json);
         } catch (JsonProcessingException e) {
             e.printStackTrace();
