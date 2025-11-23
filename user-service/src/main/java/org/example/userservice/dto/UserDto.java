@@ -1,17 +1,34 @@
 package org.example.userservice.dto;
 
+import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
+
 import java.time.LocalDateTime;
 
 /**
  * DTO для представления пользователя.
  * Используется для передачи данных между слоями приложения (контроллер и сервис).
- * Содержит поля пользователя: идентификатор, имя, email, возраст и дату создания.
  */
+@Schema(description = "DTO для пользователя, содержащий идентификатор, имя, email, возраст и дату создания")
 public class UserDto {
+
+    @Schema(description = "Уникальный идентификатор пользователя", example = "1", accessMode = Schema.AccessMode.READ_ONLY)
     private int id;
+
+    @NotBlank(message = "Имя пользователя не может быть пустым")
+    @Schema(description = "Имя пользователя")
     private String name;
+
+    @NotBlank(message = "Email не может быть пустым")
+    @Schema(description = "Email пользователя")
     private String email;
+
+    @Min(value = 0, message = "Возраст не может быть отрицательным")
+    @Schema(description = "Возраст пользователя")
     private int age;
+
+    @Schema(description = "Дата и время создания пользователя")
     private LocalDateTime createdAt;
 
     public UserDto() {
