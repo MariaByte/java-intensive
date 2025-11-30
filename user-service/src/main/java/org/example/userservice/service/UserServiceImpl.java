@@ -3,8 +3,9 @@ package org.example.userservice.service;
 import org.example.userservice.dto.UserDto;
 import org.example.userservice.entity.UserEntity;
 import org.example.userservice.repository.UserRepository;
-import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -29,8 +30,6 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDto createUser(UserDto userDto) {
-        validateUserData(userDto);
-
         UserEntity userEntity = new UserEntity(
                 userDto.getName(),
                 userDto.getEmail(),
@@ -47,7 +46,10 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDto getUserById(int id) {
         UserEntity userEntity = userRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Пользователь с ID " + id + " не найден"));
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND,
+                        "Пользователь с ID " + id + " не найден"
+                ));
 
         return toDto(userEntity);
     }
@@ -63,9 +65,10 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDto updateUser(int id, UserDto userDto) {
         UserEntity existingUser = userRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Пользователь с ID " + id + " не найден"));
-
-        validateUserData(userDto);
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND,
+                        "Пользователь с ID " + id + " не найден"
+                ));
 
         existingUser.setName(userDto.getName());
         existingUser.setEmail(userDto.getEmail());
@@ -79,23 +82,14 @@ public class UserServiceImpl implements UserService {
     @Override
     public void deleteUser(int id) {
         UserEntity user = userRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Пользователь с ID " + id + " не найден"));
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND,
+                        "Пользователь с ID " + id + " не найден"
+                ));
 
         userRepository.deleteById(id);
 
         notificationProducer.sendUserDeletedNotification(user.getEmail());
-    }
-
-    private  void validateUserData(UserDto userDto) {
-        if (userDto.getName() == null || userDto.getName().trim().isEmpty()) {
-            throw new IllegalArgumentException("Имя пользователя не может быть пустым");
-        }
-        if (userDto.getEmail() == null || userDto.getEmail().trim().isEmpty()) {
-            throw new IllegalArgumentException("Email не может быть пустым");
-        }
-        if (userDto.getAge() < 0) {
-            throw new IllegalArgumentException("Возраст не может быть отрицательным");
-        }
     }
 
     private UserDto toDto(UserEntity userEntity) {

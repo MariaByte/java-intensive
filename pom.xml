@@ -21,6 +21,7 @@
         <testcontainers.version>1.19.6</testcontainers.version>
         <greenmail.version>1.6.0</greenmail.version>
         <jackson.version>2.15.2</jackson.version>
+        <springdoc.version>2.6.0</springdoc.version>
     </properties>
 
     <dependencyManagement>
