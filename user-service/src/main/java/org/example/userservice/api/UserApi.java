@@ -67,7 +67,7 @@ public interface UserApi {
      */
     @Operation(summary = "Создать пользователя")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Пользователь успешно создан"),
+            @ApiResponse(responseCode = "201", description = "Пользователь успешно создан"),
             @ApiResponse(responseCode = "400", description = "Некорректные данные пользователя")
     })
     @PostMapping

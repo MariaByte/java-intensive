@@ -1,7 +1,5 @@
 package org.example.userservice.controller;
 
-import io.swagger.v3.oas.annotations.Parameter;
-import jakarta.validation.Valid;
 import org.example.userservice.api.UserApi;
 import org.example.userservice.dto.UserDto;
 import org.example.userservice.service.UserService;
@@ -9,8 +7,6 @@ import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.Link;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -50,6 +46,9 @@ public class UserController implements UserApi {
     @Override
     public ResponseEntity<EntityModel<UserDto>> getUser(int id) {
         UserDto user = userService.getUserById(id);
+        if (user == null) {
+            return ResponseEntity.notFound().build();
+        }
 
         return ResponseEntity.ok(toHateoasEntityModel(user));
     }

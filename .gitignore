@@ -14,7 +14,7 @@ out/
 bin/
 !**/src/main/**/bin/
 !**/src/test/**/bin/
-/notification-service/src/main/resources/application-secret.properties
+config-server/src/main/resources/config/notification-service.properties
 ### NetBeans ###
 /nbproject/private/
 /nbbuild/

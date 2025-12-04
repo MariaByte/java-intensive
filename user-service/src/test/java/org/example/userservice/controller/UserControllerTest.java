@@ -7,6 +7,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
@@ -23,7 +24,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -31,8 +31,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * Unit-тесты для {@link UserController} выполнены с использованием MockMvc и Mockito.
  * Проверяется работа CRUD операций контроллера.
  */
-@SpringBootTest
-@AutoConfigureMockMvc
+@WebMvcTest(UserController.class)
 class UserControllerTest {
 
     @Autowired
@@ -70,7 +69,7 @@ class UserControllerTest {
         mockMvc.perform(post("/api/users")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(testUser)))
-                .andExpect(status().isOk())
+                .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.id").value(testUser.getId()))
                 .andExpect(jsonPath("$.name").value(testUser.getName()))
                 .andExpect(jsonPath("$.email").value(testUser.getEmail()));
@@ -101,8 +100,7 @@ class UserControllerTest {
         when(userService.getUserById(999)).thenReturn(null);
 
         mockMvc.perform(get("/api/users/999"))
-                .andExpect(status().isOk()) // Можно изменить на NotFound, если контроллер бросает исключение
-                .andExpect(content().string(""));
+                .andExpect(status().isNotFound());
     }
 
     /**
@@ -123,9 +121,8 @@ class UserControllerTest {
 
         mockMvc.perform(get("/api/users"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.length()").value(2))
-                .andExpect(jsonPath("$[0].id").value(testUser.getId()))
-                .andExpect(jsonPath("$[1].id").value(user2.getId()));
+                .andExpect(jsonPath("$._embedded.userDtoList[0].id").value(testUser.getId()))
+                .andExpect(jsonPath("$._embedded.userDtoList[1].id").value(user2.getId()));
     }
 
     /**
@@ -155,7 +152,7 @@ class UserControllerTest {
         doNothing().when(userService).deleteUser(1);
 
         mockMvc.perform(delete("/api/users/1"))
-                .andExpect(status().isOk());
+                .andExpect(status().isNoContent());
     }
 
     /**
@@ -168,6 +165,6 @@ class UserControllerTest {
         doNothing().when(userService).deleteUser(9999);
 
         mockMvc.perform(delete("/api/users/9999"))
-                .andExpect(status().isOk());
+                .andExpect(status().isNoContent());
     }
 }

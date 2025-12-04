@@ -75,4 +75,3 @@ class EmailIntegrationTest {
         assertEquals("test@example.com", received[0].getAllRecipients()[0].toString());
     }
 }
-
