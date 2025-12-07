@@ -13,7 +13,7 @@
         <module>config-server</module>
         <module>user-service</module>
         <module>notification-service</module>
-        <module>service-discovery</module>
+        <module>discovery-server</module>
         <module>api-gateway</module>
     </modules>
 

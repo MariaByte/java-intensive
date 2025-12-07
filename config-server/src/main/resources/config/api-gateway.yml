@@ -6,6 +6,10 @@ spring:
     name: api-gateway
 
   cloud:
+    discovery:
+      locator:
+        enabled: true
+        lower-case-service-id: true
     gateway:
       routes:
         - id: user-service
@@ -20,4 +24,4 @@ spring:
 eureka:
   client:
     service-url:
-      defaultZone: http://localhost:8761/eureka/
+      defaultZone: http://discovery-server:8761/eureka/

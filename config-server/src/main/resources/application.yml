@@ -11,3 +11,9 @@ spring:
 
   profiles:
     active: native
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
