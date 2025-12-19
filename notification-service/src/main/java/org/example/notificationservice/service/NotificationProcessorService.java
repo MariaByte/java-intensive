@@ -13,6 +13,6 @@ public interface NotificationProcessorService {
      * @param message объект {@link UserNotificationDto}, содержащий email пользователя и тип события
      * @throws IllegalArgumentException если тип события неизвестен
      */
-    void process(UserNotificationDto message);
+    void process( UserNotificationDto message);
 
 }
